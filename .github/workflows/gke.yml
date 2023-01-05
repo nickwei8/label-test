@@ -1,0 +1,24 @@
+name: GKE Workflow
+
+on: [pull_request]
+jobs:
+  gke:
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: 'actions/checkout@v3'
+    - id: 'auth'
+      name: 'Authenticate to Google Cloud'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: 'projects/27803622623/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+        service_account: 'github-sa@kamigcp.iam.gserviceaccount.com'
+    - id: get-gke-credentials
+      uses: google-github-actions/get-gke-credentials@v1
+      with:
+        cluster_name: main-cluster
+        location: us-east1-b
+    - id: get-pods
+      run: kubectl get pods
